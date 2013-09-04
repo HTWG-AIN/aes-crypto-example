@@ -23,9 +23,6 @@ public class AESCrypto {
     private static final String STORE_PASSWORD = "mystorepass";
     private static final String SECRET_TEXT = "My Secret Text";
 
-    private AESCrypto() {
-    }
-
     /**
      * @param typeKeyStore   @throws java.io.IOException
      * @param pathToKeyStore
