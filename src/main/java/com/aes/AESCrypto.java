@@ -71,6 +71,7 @@ public class AESCrypto {
 
         // Switch the cipher to decryption
         desCipher.init(Cipher.DECRYPT_MODE, myDesKey);
+
         byte[] decodedValue = Base64.decodeBase64(textEncrypted);
 
         // Decrypt the text
@@ -114,7 +115,7 @@ public class AESCrypto {
 
             System.out.println("Text Encrypted : " + textEncrypted);
             String encodeBase64String = Base64.encodeBase64String(textEncrypted);
-            System.out.println("String Encrypted : " +  encodeBase64String);
+            System.out.println("Encode Base64 String Encrypted : " +  encodeBase64String);
 
             // Decrypt the text
 
