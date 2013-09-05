@@ -1,11 +1,21 @@
 package com.aes;
 
-import javax.crypto.*;
+import org.apache.commons.codec.binary.Base64;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.security.*;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.KeyStore;
 import java.security.KeyStore.SecretKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 
 /**
@@ -22,11 +32,13 @@ public class AESCrypto {
     private static final String ALIAS_PASSWORD = "mykeypass";
     private static final String STORE_PASSWORD = "mystorepass";
     private static final String SECRET_TEXT = "My Secret Text";
+    private static final String UNICODE_FORMAT  = "UTF8";
+    private static final String AES  = "AES";
 
     /**
-     * @param typeKeyStore   @throws java.io.IOException
+     * @param typeKeyStore
      * @param pathToKeyStore
-     * @param storePasswod
+     * @param storePassword
      * @param aliasPassword
      * @param keyAlias
      * @throws java.io.FileNotFoundException
@@ -36,22 +48,42 @@ public class AESCrypto {
      *
      */
 
-    public SecretKey getSecretKey(String typeKeyStore,
-                                  String pathToKeyStore,
-                                  String storePasswod,
-                                  String keyAlias,
-                                  String aliasPassword ) throws KeyStoreException,
+    public SecretKey getSecretKey(final String typeKeyStore,
+                                  final String pathToKeyStore,
+                                  final String storePassword,
+                                  final String keyAlias,
+                                  final String aliasPassword) throws KeyStoreException,
             IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableEntryException {
 
         KeyStore ks = KeyStore.getInstance(typeKeyStore);
         ks.load(new FileInputStream(pathToKeyStore),
-                storePasswod.toCharArray());
+                storePassword.toCharArray());
 
         SecretKeyEntry entry = (SecretKeyEntry) ks.getEntry(
                 keyAlias,
                 new KeyStore.PasswordProtection(aliasPassword
                         .toCharArray()));
         return entry.getSecretKey();
+    }
+
+    private static byte[] decryptText(final Cipher desCipher, final SecretKey myDesKey, final String textEncrypted)
+            throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, IOException {
+
+        // Switch the cipher to decryption
+        desCipher.init(Cipher.DECRYPT_MODE, myDesKey);
+        byte[] decodedValue = Base64.decodeBase64(textEncrypted);
+
+        // Decrypt the text
+        return desCipher.doFinal(decodedValue);
+    }
+
+    private static byte[] encryptText(final Cipher desCipher, final SecretKey myDesKey, final String secretText)
+            throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, UnsupportedEncodingException {
+        // Initialize the cipher for encryption
+        desCipher.init(Cipher.ENCRYPT_MODE, myDesKey);
+        // Encrypt the text
+
+        return desCipher.doFinal(secretText.getBytes(UNICODE_FORMAT));
     }
 
     public static void main(String[] argv) {
@@ -68,10 +100,7 @@ public class AESCrypto {
             Cipher desCipher;
 
             // Create the cipher with AES algorithm
-            desCipher = Cipher.getInstance("AES");
-
-            // Initialize the cipher for encryption
-            desCipher.init(Cipher.ENCRYPT_MODE, myDesKey);
+            desCipher = Cipher.getInstance(AES);
 
             // secret text
             byte[] text = SECRET_TEXT.getBytes();
@@ -80,15 +109,16 @@ public class AESCrypto {
             System.out.println("Text : " + new String(text));
 
             // Encrypt the text
-            byte[] textEncrypted = desCipher.doFinal(text);
+//
+            byte[] textEncrypted = encryptText(desCipher, myDesKey, SECRET_TEXT);
 
             System.out.println("Text Encrypted : " + textEncrypted);
-
-            // Switch the cipher to decryption
-            desCipher.init(Cipher.DECRYPT_MODE, myDesKey);
+            String encodeBase64String = Base64.encodeBase64String(textEncrypted);
+            System.out.println("String Encrypted : " +  encodeBase64String);
 
             // Decrypt the text
-            byte[] textDecrypted = desCipher.doFinal(textEncrypted);
+
+            byte[] textDecrypted =  decryptText(desCipher, myDesKey, encodeBase64String);
 
             System.out.println("Text Decrypted : " + new String(textDecrypted));
 
@@ -111,7 +141,8 @@ public class AESCrypto {
         } catch (UnrecoverableEntryException e) {
             e.printStackTrace();
         }
-
     }
+
+
 
 }
