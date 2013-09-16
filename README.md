@@ -12,7 +12,8 @@ aes-crypto-example
 
           run AESCrypto
 
-          Text [Byte Format] : [B@a761fe
-          Text : My Secret Text
-          Text Encrypted : [B@6d126b07
-          Text Decrypted : My Secret Text
+            Text [Byte Format] : [B@10382a9
+            Text : My Secret Text
+            Text Encrypted : [B@a761fe
+            Encode Base64 String Encrypted : 94tY+otQOYMM8GGseUlb9g==
+            Text Decrypted : My Secret Text
