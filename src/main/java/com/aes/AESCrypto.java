@@ -87,7 +87,7 @@ public class AESCrypto {
         return desCipher.doFinal(secretText.getBytes(UNICODE_FORMAT));
     }
 
-    public static void main(String[] argv) {
+    public static void main(String[] args) {
 
         try {
 
@@ -110,7 +110,7 @@ public class AESCrypto {
             System.out.println("Text : " + new String(text));
 
             // Encrypt the text
-//
+
             byte[] textEncrypted = encryptText(desCipher, myDesKey, SECRET_TEXT);
 
             System.out.println("Text Encrypted : " + textEncrypted);
