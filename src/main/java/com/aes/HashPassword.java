@@ -56,9 +56,8 @@ public class HashPassword {
         String[] algorithms = {"PBKDF2WithHmacSHA1"};
 
         // Generate a random salt
-        SecureRandom random = new SecureRandom();
         byte[] salt = new byte[24];  // SALT_LENGTH = 24
-        random.nextBytes(salt);
+        new SecureRandom().nextBytes(salt);
 
         for (String algorithm : algorithms) {
             // Hash the password
